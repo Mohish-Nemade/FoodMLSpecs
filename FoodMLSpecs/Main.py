@@ -1,51 +1,56 @@
-from flask import Flask, jsonify,request,abort
+from flask import Flask,jsonify,request,abort
 import DecodeImage
 import Tensorflow
 app = Flask(__name__)
 
-food_image = []
+
+result=[]
+tasks = [
+    {
+        'id': 1,
+        'title': u'Buy groceries',
+        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
+        'done': False
+    },
+    {
+        'id': 2,
+        'title': u'Learn Python',
+        'description': u'Need to find a good Python tutorial on the web',
+        'done': False
+    }
+]
 
 
-
-@app.route('/image/', methods=['GET'])
+@app.route('/tate/', methods=['GET'])
 def get_tasks():
-    return jsonify({'tasks': tasks})
+    return "hello tate"
 
-@app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['GET'])
-def get_task(task_id):
-    task = [task for task in tasks if task['id'] == task_id]
-    if len(task) == 0:
-        abort(404)
-    return jsonify({'task': task[0]})
 
 @app.route('/image/', methods=['POST'])
 def upload_image():
-    if not request.json or not 'encode_image' in request.json:
-        abort(400)
-
-
-    food_image =   {
+    food_image = []
+    print("sdsaasd")
+    food_image = {
         'id': request.json['id'],
         'encoded_image': request.json['encoded_image'],
-        'result_status': request.json('result_status'),
-        'image_type': request.json('image_type'),
-        'food_name': request.json('food_image'),
-        'food_details': request.json('food_details')
+        #'result_status': request.json('result_status'),
+        'image_type': request.json.get('image_type'),
+        #'food_name': request.json('food_image'),
+       # 'food_details': request.json('food_details')
     }
 
-    save_directory = DecodeImage.decode_image(food_image)
-    Tensorflow.image_into_tensdorflow(save_directory)
 
-
-    tasks.append(task)
-    return jsonify({'task': task})
-
-def decode(des):
-    getimage = base64.decodestring(des)
-    i = Image.open(BytesIO(getimage))
-    path = r'D:\tensorflow\abcd'
-    i.save(path + '.jpg')
-
+    task = {
+        'id': 1,
+        'title': 1,
+        'description': 1,
+        'done': False
+    }
+    #save_directory = DecodeImage.decode_image(food_image)
+   # result=Tensorflow.image_into_tensdorflow(save_directory)
+   # print(result)
+    #return jsonify({'food_image': food_image}),201
+    return jsonify({'task': task}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
