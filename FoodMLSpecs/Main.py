@@ -39,18 +39,21 @@ def upload_image():
        # 'food_details': request.json('food_details')
     }
 
-
-    task = {
+    a=12
+    result1 = {
         'id': 1,
-        'title': 1,
+        'title': a,
         'description': 1,
         'done': False
     }
-    #save_directory = DecodeImage.decode_image(food_image)
-   # result=Tensorflow.image_into_tensdorflow(save_directory)
+    save_directory = DecodeImage.decode_image(food_image)
+    Tensorflow.image_into_tensdorflow(save_directory)
+    print("tatti")
+   # print(result)
+    print("tatti2")
    # print(result)
     #return jsonify({'food_image': food_image}),201
-    return jsonify({'task': task}), 201
+    return jsonify({'result1': result1}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
