@@ -2,16 +2,17 @@ from flask import Flask,jsonify,request,abort
 import DecodeImage
 import Tensorflow
 import os
+import foodSearch
 app = Flask(__name__)
 
 
 result=[]
 
 
+
 @app.route('/image/', methods=['POST'])
 def upload_image():
     food_image = []
-    print("sdsaasd")
     food_image = {
         'id': request.json['id'],
         'encoded_image': request.json['encoded_image'],
@@ -30,6 +31,11 @@ def upload_image():
 
     return jsonify(food_image)
 
+
+
+
+
+
 @app.route('/status/',methods=['POST'])
 def status_image():
     food_image = {
@@ -47,6 +53,18 @@ def status_image():
         print(dest_directory)
         print(food_image['image_directory'])
         os.rename(food_image['image_directory'], dest_directory)
+    else:
+        #Search code to be written
+
+
+        #if food not found in db
+        if os.path.isdir("/home/ml/untrained/" + food_image['food_correct']):
+            dest_directory = "/home/ml/untrained/" + food_image['food_correct'] + '/' + str(food_image['id']) + food_image['image_type']
+            os.rename(food_image['image_directory'], dest_directory)
+        else:
+            directory = "/home/ml/untrained/" + food_image['food_correct']
+            os.makedirs(directory)
+            os.rename(food_image['image_directory'], directory + '/' + str(food_image['id']) + food_image['image_type'])
 
 
 
