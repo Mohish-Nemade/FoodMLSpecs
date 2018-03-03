@@ -1,14 +1,75 @@
-from flask import Flask,jsonify,request,abort
+from flask import Flask,jsonify,request,abort,render_template
+import Database,dbConnect,stringsearch
+from werkzeug.utils import secure_filename
 import DecodeImage
 import Tensorflow
 import os
-import foodSearch
-app = Flask(__name__)
 
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER']='/home/ml/saveimage/'
+app.config['upload_image']="/home/ml/saveimage/"
 
 result=[]
 
 
+@app.route('/upload/')
+def upload_file():
+    return render_template('upload.html')
+
+
+@app.route('/uploader', methods=['GET','POST'])
+def upload_file1():
+    if request.method == 'POST':
+        f = request.files['file']
+        print(f)
+        #f.save(secure_filename(f.filename))
+        f.save(os.path.join(app.config['upload_image'], f.filename))
+        print(f.filename)
+        return 'file uploaded successfully'
+
+@app.route('/search/', methods=['POST'])
+def search_image():
+    userid = request.json['id']
+    userin = request.json['user_input']
+    db = dbConnect.connectDb()
+    store = db.fooditem.find()
+    result=[]
+    for item in store:
+        res = stringsearch.KMPSearch(userin,item["item"])
+        if(res==1):
+            result.append(item["item"])
+
+    print(result)
+    return jsonify(result)
+
+'''@app.route('/adminupload/', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('uploaded_file',
+                                    filename=filename))
+    return 
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <p><input type=file name=file>
+         <input type=submit value=Upload>
+    </form>
+    
+'''
 
 @app.route('/image/', methods=['POST'])
 def upload_image():
@@ -28,11 +89,9 @@ def upload_image():
     food_image['image_directory'] = save_directory
     food_output = Tensorflow.image_into_tensorflow(save_directory)
     food_image['food_name'] = food_output
+    #Database.insert_fun(food_image)
 
     return jsonify(food_image)
-
-
-
 
 
 
